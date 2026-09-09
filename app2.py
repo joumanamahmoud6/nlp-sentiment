@@ -58,7 +58,9 @@ if st.button("Predict", type="primary"):
         model       = load_lstm()
         encoded     = encode(review, word_to_idx)
         input_tensor = tf.constant(encoded, dtype=tf.float32)
-        score = float(model(input_tensor, training=False)[0][0])
+        infer = model.signatures['serving_default']
+        output = infer(input_tensor)
+        score = float(list(output.values())[0][0][0])
         label       = "Positive 😊" if score >= 0.5 else "Negative 😞"
         confidence  = score if score >= 0.5 else 1 - score
 
