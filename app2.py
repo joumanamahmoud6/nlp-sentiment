@@ -20,9 +20,13 @@ def load_word_index():
     word_to_idx['<UNK>']   = 2
     return word_to_idx
 
+import os
+
 @st.cache_resource
 def load_lstm():
-    return tf.saved_model.load('lstm_saved_model')
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(base_dir, 'lstm_saved_model')
+    return tf.saved_model.load(model_path)
 
 # ── Preprocessing ────────────────────────────────────────────────────────────
 def clean(text):
