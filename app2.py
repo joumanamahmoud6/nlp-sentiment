@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import re
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.datasets import imdb
@@ -21,7 +22,7 @@ def load_word_index():
 
 @st.cache_resource
 def load_lstm():
-    return load_model('lstm_model.h5')
+    return tf.saved_model.load('lstm_saved_model')
 
 # ── Preprocessing ────────────────────────────────────────────────────────────
 def clean(text):
@@ -52,7 +53,8 @@ if st.button("Predict", type="primary"):
         word_to_idx = load_word_index()
         model       = load_lstm()
         encoded     = encode(review, word_to_idx)
-        score       = model.predict(encoded, verbose=0)[0][0]
+        input_tensor = tf.constant(encoded, dtype=tf.float32)
+        score = float(model(input_tensor, training=False)[0][0])
         label       = "Positive 😊" if score >= 0.5 else "Negative 😞"
         confidence  = score if score >= 0.5 else 1 - score
 
